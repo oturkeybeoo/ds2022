@@ -11,6 +11,9 @@ USTH ICT 2022 Distributed Systems
 Group Info
 =======================
 
-* Name 1 (ID1)
-* Name 2 (ID2)
+* Nguyễn Trấn Nguyên - BI10-128
+* Mai Xuân Hiếu - BI10-064
+* Nguyễn Anh Quân - BI10-149
+* Nguyễn Tương Quỳnh - BI10-154
+* Nguyễn Quang Vinh - BI10-195
 
