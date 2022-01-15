@@ -33,10 +33,11 @@ int main() {
         if (pid == 0) {
             // I'm the son, I'll serve this client
             printf("client connected\n");
+            
             while (1) {
                 // it's client turn to chat, I wait and read message from client
-                read(cli, s, sizeof(s));
-                printf("client says: %s\n",s);
+                // read(cli, s, sizeof(s));
+                // printf("client says: %s\n",s);
 
                 // now it's my (server) turn
                 printf("server>");
