@@ -34,19 +34,26 @@ int main() {
             // I'm the son, I'll serve this client
             printf("client connected\n");
             
-            while (1) {
-                // it's client turn to chat, I wait and read message from client
-                // read(cli, s, sizeof(s));
-                // printf("client says: %s\n",s);
-
-                // now it's my (server) turn
-                printf("server>");
-                scanf("%s", s);
-                write(cli, s, strlen(s) + 1);
+            FILE* file;
+            file = fopen("recieve_file.txt", "w");
+            if (file == NULL) {
+            	printf("Cannot open file");
+            } else {
+            	printf("Start writing file");
             }
+            
+            char buffer[1024];
+            while (1) {
+                int i = recv(cli, buffer, sizeof(buffer), 0);
+                if (i <= 0) {
+                	break;
+                }
+                fprintf(file, "%s", buffer);
+                memset(&buffer, 0, sizeof(buffer));
+            }
+            
             return 0;
-        }
-        else {
+        } else {
             // I'm the father, continue the loop to accept more clients
             continue;
         }

@@ -26,19 +26,26 @@ int main(int argc, char* argv[]) {
 
     // connect to server
     connect(serv, (struct sockaddr*)&ad, ad_length);
-
-    while (1) {
-        // after connected, it's client turn to chat
-
-        // send some data to server
-        printf("client>");
-        scanf("%s", s);
-        write(serv, s, strlen(s) + 1);
-
-        // then it's server turn
-        read(serv, s, sizeof(s));
-
-        printf("server says: %s\n", s);
+    
+    memset(&s, 0, 100);
+    FILE* file;
+    file = fopen("send_file.txt", "r");
+    if (file == NULL) {
+    	printf("The file is null");
+    } else {
+    	printf("Read file successfully");
     }
+    
+    char buffer[1024] = {0};
+    while (fgets(buffer, sizeof(buffer), file) != NULL) {
+    	int i = send(serv, buffer, sizeof(buffer), 0);
+    	if (i == -1) {
+    		printf("Send data fail");
+    	}
+    	memset(&buffer, 0, sizeof(buffer));
+    }
+    
+    close(serv);
+    return 0;
 }
 
