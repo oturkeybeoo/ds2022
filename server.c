@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
-//#include <sys/socket.h>
+#include <sys/socket.h>
 #include <netdb.h>
-#include <Winsock2.h>
+#include <unistd.h>
 
 int main() {
     int ss, cli, pid;
@@ -20,14 +20,14 @@ int main() {
     ad.sin_family = AF_INET;
     ad.sin_addr.s_addr = INADDR_ANY;
     ad.sin_port = htons(12345);
-    bind(ss, (struct sockaddr *)&ad, ad_length);
+    bind(ss, (struct sockaddr*)&ad, ad_length);
 
     // then listen
     listen(ss, 0);
 
     while (1) {
         // an incoming connection
-        cli = accept(ss, (struct sockaddr *)&ad, &ad_length);
+        cli = accept(ss, (struct sockaddr*)&ad, &ad_length);
 
         pid = fork();
         if (pid == 0) {
@@ -39,7 +39,7 @@ int main() {
                 printf("client says: %s\n",s);
 
                 // now it's my (server) turn
-                printf("server>", s);
+                printf("server>");
                 scanf("%s", s);
                 write(cli, s, strlen(s) + 1);
             }
@@ -52,5 +52,6 @@ int main() {
     }
     // disconnect
     close(cli);
+    close(ss);
 
 }

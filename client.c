@@ -1,4 +1,4 @@
-
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,11 +21,11 @@ int main(int argc, char* argv[]) {
     hep = gethostbyname(argv[1]);
     memset(&ad, 0, sizeof(ad));
     ad.sin_family = AF_INET;
-    ad.sin_addr = *(struct in_addr *)hep->h_addr_list[0];
+    ad.sin_addr = *(struct in_addr*)hep->h_addr_list[0];
     ad.sin_port = htons(12345);
 
     // connect to server
-    connect(serv, (struct sockaddr *)&ad, ad_length);
+    connect(serv, (struct sockaddr*)&ad, ad_length);
 
     while (1) {
         // after connected, it's client turn to chat
