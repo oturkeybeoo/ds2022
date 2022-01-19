@@ -1,0 +1,242 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2580
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 \\documentclass[13pt]\{article\}\
+\\renewcommand\{\\baselinestretch\}\{1.0\}\
+\\usepackage[utf8]\{vietnam\}\
+\\usepackage[a4paper, total=\{6in, 8in\}]\{geometry\}\
+\\usepackage[vietnamese,english]\{babel\}\
+\\usepackage\{hyperref\}\
+\\usepackage\{mathtools\}\
+\\usepackage\{amssymb\}\
+\\usepackage\{indentfirst\}\
+\\usepackage\{graphicx\}\
+\\usepackage\{minted\}\
+\\usepackage\{ragged2e\}\
+\\usepackage[nottoc]\{tocbibind\}\
+\
+\\hypersetup\{\
+    colorlinks=true,\
+    linkcolor=blue,\
+    citecolor=blue,\
+    urlcolor=blue,\
+\}\
+\\begin\{document\}\
+\\begin\{titlepage\}\
+    \\begin\{center\}\
+        \\vspace*\{1.8cm\}\
+        \\Large\
+        Distributed System Labwork 1\\\\\
+        \\Large\
+        \\vspace\{0.5cm\}\
+        \\begin\{center\}\
+            \\includegraphics[scale=1.0]\{logo USTH-01.PNG\}\
+        \\end\{center\}  \
+        \\vspace\{0.5cm\}\
+            Group 6 - ICT\\\\\
+        \\vspace\{0.5cm\}\
+            University of Science and Technology of Hanoi\\\\\
+        \\vspace\{0.5cm\}\
+            January, 2022\
+        \\vfill\
+          \
+   \\end\{center\}\
+\\end\{titlepage\}\
+\
+\\newpage\
+\\tableofcontents\
+\\newpage\
+\
+\\section\{Introduction\}\
+\\subsection\{Overview\}\
+\\noindent%\
+Based on the given chat system, we try to develop a file transfer via TCP/IP in CLI in this labwork.\
+\
+\\subsection\{Protocol\}\
+\
+\\begin\{figure\}[h]\
+    \\centering\
+    \\includegraphics[scale=0.15]\{protocol-01.png\}\
+    \\caption\{Protocol diagram\}\
+    \\label\{fig:protocol\}\
+\\end\{figure\}\
+\
+\\subsection\{System organization\}\
+\\noindent%\
+The server establishes a unique port, which in our case is 12345, which was provided by our teacher. It accepts one argument, the IP address, from the client CLI. A single client connects to a single server. The client sends data through a buffer, which is a character array. The buffer's maximum size is 1024 bytes. The server will write the buffer to the file after receiving it. After reaching the end-of-file, the client will notify the server that there is nothing remaining. Both the server and the client will then shutdown.\
+\
+\\begin\{figure\}[H]\
+    \\centering\
+    \\includegraphics[scale=0.25]\{system-01.png\}\
+    \\caption\{System organization\}\
+\\end\{figure\}\
+\
+\\subsection\{Implementation\}\
+\\noindent%\
+From the client, we type gcc client.c -o client. Then type ./client localhost\
+\\noindent%\
+We have implemented the client side:\
+\
+\\begin\{minted\}\{c\}\
+#include <unistd.h>\
+#include <stdio.h>\
+#include <stdlib.h>\
+#include <string.h>\
+#include <sys/types.h>\
+#include <sys/socket.h>\
+#include <netdb.h>\
+\
+int main(int argc, char* argv[]) \{\
+    int so;\
+    char s[100];\
+    struct sockaddr_in ad;\
+\
+    socklen_t ad_length = sizeof(ad);\
+    struct hostent *hep;\
+\
+    // create socket\
+    int serv = socket(AF_INET, SOCK_STREAM, 0);\
+\
+    // init address\
+    hep = gethostbyname(argv[1]);\
+    memset(&ad, 0, sizeof(ad));\
+    ad.sin_family = AF_INET;\
+    ad.sin_addr = *(struct in_addr*)hep->h_addr_list[0];\
+    ad.sin_port = htons(12345);\
+\
+    // connect to server\
+    connect(serv, (struct sockaddr*)&ad, ad_length);\
+    \
+    memset(&s, 0, 100);\
+    FILE* file;\
+    file = fopen("send_file.txt", "r");\
+    if (file == NULL) \{\
+    	printf("The file is null");\
+    \} else \{\
+    	printf("Read file successfully\\n");\
+    \}\
+    \
+    char buffer[1024] = \{0\};\
+    while (fgets(buffer, sizeof(buffer), file) != NULL) \{\
+    	int i = send(serv, buffer, sizeof(buffer), 0);\
+    	if (i == -1) \{\
+    		printf("Send data fail");\
+    	\}\
+    	memset(&buffer, 0, sizeof(buffer));\
+    \}\
+    printf("File sent!");\
+    \
+    close(serv);\
+    return 0;\
+\}\
+\
+\\end\{minted\}\
+\\noindent%\
+From the server, we type gcc server.c -o server. Then type ./server.\
+\\noindent%\
+We have implemented the server side:\
+\\begin\{minted\}\{c\}\
+#include <stdio.h>\
+#include <stdlib.h>\
+#include <string.h>\
+#include <sys/types.h>\
+#include <sys/socket.h>\
+#include <netdb.h>\
+#include <unistd.h>\
+\
+int main() \{\
+    int ss, cli, pid;\
+    struct sockaddr_in ad;\
+    char s[100];\
+    socklen_t ad_length = sizeof(ad);\
+\
+    // create the socket\
+    ss = socket(AF_INET, SOCK_STREAM, 0);\
+\
+    // bind the socket to port 12345\
+    memset(&ad, 0, sizeof(ad));\
+    ad.sin_family = AF_INET;\
+    ad.sin_addr.s_addr = INADDR_ANY;\
+    ad.sin_port = htons(12345);\
+    bind(ss, (struct sockaddr*)&ad, ad_length);\
+\
+    // then listen\
+    listen(ss, 0);\
+\
+    while (1) \{\
+        // an incoming connection\
+        cli = accept(ss, (struct sockaddr*)&ad, &ad_length);\
+\
+        pid = fork();\
+        if (pid == 0) \{\
+            // I'm the son, I'll serve this client\
+            printf("client connected\\n");\
+            \
+            FILE* file;\
+            file = fopen("recieve_file.txt", "w");\
+            if (file == NULL) \{\
+            	printf("Cannot open file");\
+            \} else \{\
+            	printf("Start writing file\\n");\
+            \}\
+            \
+            char buffer[1024];\
+            while (1) \{\
+                int i = recv(cli, buffer, sizeof(buffer), 0);\
+                if (i <= 0) \{\
+                	break;\
+                \}\
+                fprintf(file, "%s", buffer);\
+                memset(&buffer, 0, sizeof(buffer));\
+            \}\
+            printf("File received!");\
+            \
+            return 0;\
+        \} else \{\
+            // I'm the father, continue the loop to accept more clients\
+            continue;\
+        \}\
+    \}\
+    // disconnect\
+    close(cli);\
+    close(ss);\
+\
+\}\
+\\end\{minted\}\
+\\noindent%\
+Here is the result:\
+\\begin\{figure\}[H]\
+    \\centering\
+    \\includegraphics[scale=0.5]\{client.PNG\}\
+    \\caption\{Client side\}\
+\\end\{figure\}\
+\
+\\begin\{figure\}[H]\
+    \\centering\
+    \\includegraphics[scale=0.5]\{server.PNG\}\
+    \\caption\{Server side\}\
+\\end\{figure\}\
+\\subsection\{Contribution\}\
+\\noindent%\
+\\begin\{table\}[ht!]\
+  \\begin\{center\}\
+    \\label\{tab:table1\}\
+    \\begin\{tabular\}\{l|l\}\
+      \\textbf\{Member\} & \\textbf\{Contribution\}\\\\\
+      \\hline\
+      Nguyen Quang Vinh & Client code\\\\\
+      Nguyen Tran Nguyen & Server code\\\\\
+      Mai Xuan Hieu & Design Protocol\\\\\
+      Nguyen Anh Quan & Design Architecture\\\\\
+      Nguyen Tuong Quynh & Report\\\\\
+    \\end\{tabular\}\
+    \\caption\{Contribution Table\}\
+  \\end\{center\}\
+\\end\{table\}\
+\
+\
+\\end\{document\}}
