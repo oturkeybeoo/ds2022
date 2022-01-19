@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
     if (file == NULL) {
     	printf("The file is null");
     } else {
-    	printf("Read file successfully");
+    	printf("Read file successfully\n");
     }
     
     char buffer[1024] = {0};
@@ -44,6 +44,7 @@ int main(int argc, char* argv[]) {
     	}
     	memset(&buffer, 0, sizeof(buffer));
     }
+    printf("File sent!");
     
     close(serv);
     return 0;

@@ -39,7 +39,7 @@ int main() {
             if (file == NULL) {
             	printf("Cannot open file");
             } else {
-            	printf("Start writing file");
+            	printf("Start writing file\n");
             }
             
             char buffer[1024];
@@ -51,6 +51,7 @@ int main() {
                 fprintf(file, "%s", buffer);
                 memset(&buffer, 0, sizeof(buffer));
             }
+            printf("File received!");
             
             return 0;
         } else {

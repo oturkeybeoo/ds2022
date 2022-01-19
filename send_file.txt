@@ -1,1 +1,5 @@
 Hello this is the sent file. If you open this in the receive file the the message have been recieved :)
+
+Message number 2: Hi just capturing the sceen for the report
+
+This is the third message because I'm stupid
