@@ -1,3 +1,8 @@
+# To run this program
+# Install MPI from Microsoft
+# Check install successfully in terminal: mpiexec
+# Run this program: mpiexec -n 2 python mpi.py
+# Done
 from mpi4py import MPI
 import os
 
