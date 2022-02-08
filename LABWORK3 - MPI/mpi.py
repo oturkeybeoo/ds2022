@@ -1,12 +1,23 @@
 from mpi4py import MPI
+import os
 
 comm = MPI.COMM_WORLD
 size = comm.Get_size()
 rank = comm.Get_rank()
-file = open("filetotransfer.txt", "r").read()
+
+fileName = os.path.basename("./filetransfer.txt")
+fileContent = open("filetransfer.txt", "r").read()
+
+sentMail = (fileName, fileContent)
+
 if rank == 0:
-  comm.send(file, dest=1)
-  print("From rank", str(rank), "we sent: ", file)
+  comm.send(sentMail, dest=1)
+  print("From rank", str(rank), "we sent: ", sentMail)
+  
 if rank == 1:
-  data = comm.recv(source=0)
-  print("From rank", str(rank), "we received: ", data)
+  receivedMail = comm.recv(source=0)
+  print("From rank", str(rank), "we received: ", receivedMail)
+  f = open("./mailbox/" + fileName, "w")
+  f.write(receivedMail[1])
+  f.close()
+  print("Check mail in mailbox!")
