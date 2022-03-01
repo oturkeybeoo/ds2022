@@ -1,4 +1,4 @@
-* Setup:
+# Setup:
 
 ** - Create some postgres cluster
 ** - Include cluster connection info in node_config.py
