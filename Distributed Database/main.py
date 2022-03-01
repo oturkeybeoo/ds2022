@@ -1,4 +1,3 @@
-from click import prompt
 from init import Session
 from commands import *
 from utils import *

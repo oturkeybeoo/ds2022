@@ -1,6 +1,3 @@
-from importlib.metadata import metadata
-from operator import le
-from select import select
 from commands import *
 import psycopg2
 
