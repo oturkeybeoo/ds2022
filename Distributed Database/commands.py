@@ -21,3 +21,11 @@ def delete_by_column_command(table_name, column, value):
         DELETE FROM {} WHERE {} = '{}';
     """.format(table_name,column,value)
     return command
+
+def join_command(table_1, table_2, join_columns, select_columns):
+    columns_string = ", ".join([c for c in select_columns])
+    command = """
+        SELECT {} from {} JOIN {}
+        ON {}.{} = {}.{};
+    """.format(columns_string, table_1,table_2,table_1,join_columns[0],table_2,join_columns[1])
+    return command
